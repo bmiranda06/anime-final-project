@@ -28,10 +28,8 @@
           </div>
           <ul id="boot-lines" class="boot-lines" aria-live="polite"></ul>
           <div class="instruction-grid">
-            <span>WASD / Arrow Keys: move</span>
-            <span>Click map: walk to target</span>
-            <span>1-4: unlocked realities</span>
-            <span>E near ???: speak</span>
+            <span>Click: walk</span>
+            <span>E: interact</span>
           </div>
         </div>
       </section>
@@ -92,6 +90,14 @@
                 </button>
               </div>
             </section>
+            <section id="intro-overlay" class="intro-overlay hidden" aria-live="polite">
+              <div class="intro-text-wrap">
+                <p id="intro-text" class="intro-text"></p>
+                <button id="intro-next-button" class="intro-next-button hidden" type="button">
+                  Next
+                </button>
+              </div>
+            </section>
           </div>
 
           <aside class="side-panel">
@@ -107,10 +113,25 @@
               <p class="hint-text">In Body reality, physical barriers matter. Find every ???.</p>
             </div>
           </aside>
+          <aside class="controls-hint" aria-label="Controls">
+            <span>Click: Walk</span>
+            <span>E: Interact</span>
+          </aside>
         </section>
       </section>
     </main>
 
+    <script src="data/realities.js"></script>
+    <script src="layers/body.js"></script>
+    <script src="layers/artificialBody.js"></script>
+    <script src="layers/dream.js"></script>
+    <script src="layers/network.js"></script>
+    <script src="systems/typewriter.js"></script>
+    <script src="systems/movement.js"></script>
+    <script src="systems/dialogue.js"></script>
+    <script src="systems/selfTalk.js"></script>
+    <script src="systems/matchingGame.js"></script>
+    <script src="systems/screenEffects.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
