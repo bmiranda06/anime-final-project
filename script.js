@@ -32,6 +32,9 @@
     selfTalkReady: false,
     selfTalkOnComplete: null,
     movementFreezeUntil: 0,
+    identityChoiceActive: false,
+    identityChoiceStep: 0,
+    virtualTransitionActive: false,
   };
 
   game.elements = {
@@ -61,6 +64,11 @@
     introOverlay: document.querySelector("#intro-overlay"),
     introText: document.querySelector("#intro-text"),
     introNextButton: document.querySelector("#intro-next-button"),
+    identityChoiceOverlay: document.querySelector("#identity-choice-overlay"),
+    identityQuestionText: document.querySelector("#identity-question-text"),
+    identityNextButton: document.querySelector("#identity-next-button"),
+    identityAnswerButtons: document.querySelector("#identity-answer-buttons"),
+    virtualTransitionOverlay: document.querySelector("#virtual-transition-overlay"),
     realityLabel: document.querySelector("#reality-label"),
     realityButtons: document.querySelector("#reality-buttons"),
     systemMessage: document.querySelector("#system-message"),
@@ -125,11 +133,20 @@
     game.state.selfTalkReady = false;
     game.state.selfTalkOnComplete = null;
     game.state.movementFreezeUntil = 0;
+    game.state.identityChoiceActive = false;
+    game.state.identityChoiceStep = 0;
+    game.state.virtualTransitionActive = false;
+    game.endingScoreSystem.resetEndingScores();
     game.elements.clickTarget.classList.remove("active");
     game.elements.dialogueBox.classList.add("hidden");
     game.elements.matchingOverlay.classList.add("hidden");
     game.elements.introOverlay.classList.add("hidden");
     game.elements.introNextButton.classList.add("hidden");
+    game.elements.identityChoiceOverlay.classList.add("hidden");
+    game.elements.identityAnswerButtons.classList.add("hidden");
+    game.elements.identityNextButton.classList.add("hidden");
+    game.elements.virtualTransitionOverlay.classList.add("hidden");
+    game.elements.virtualTransitionOverlay.classList.remove("virtual-transition-active");
     game.elements.interactionPrompt.classList.remove("visible");
     game.systems.screenEffects.setCrackStage(0);
     game.systems.movement.stopGameLoop();
@@ -157,7 +174,11 @@
     updateRealityButtonState();
   }
 
-  function setReality(realityId) {
+  function setReality(realityId, options = {}) {
+    if (game.state.virtualTransitionActive && !options.force) {
+      return;
+    }
+
     if (!game.state.unlockedRealities.has(realityId)) {
       game.elements.systemMessage.textContent =
         "Reality layer locked. The body has not broken open yet.";
@@ -216,7 +237,7 @@
     game.state.player.y = 55;
     game.state.player.targetX = 50;
     game.state.player.targetY = 55;
-    setReality("artificial");
+    setReality("artificial", { force: true });
     game.layers.artificialBody.onEnter();
     game.systems.movement.renderPlayer();
   }
@@ -294,6 +315,15 @@
       return;
     }
 
+    if (game.state.identityChoiceActive) {
+      if ((key === "enter" || key === " " || key === "e") && game.state.identityChoiceStep === 0) {
+        event.preventDefault();
+        game.systems.identityChoice.advance();
+      }
+
+      return;
+    }
+
     if (!game.elements.dialogueBox.classList.contains("hidden")) {
       if (key === "enter" || key === " " || key === "e") {
         event.preventDefault();
@@ -325,6 +355,10 @@
 
   game.elements.startButton.addEventListener("click", startBootSequence);
   game.elements.returnTitleButton.addEventListener("click", () => {
+    if (game.state.virtualTransitionActive) {
+      return;
+    }
+
     game.systems.movement.stopGameLoop();
     showScreen("title");
   });
@@ -332,6 +366,8 @@
   game.elements.dialogueBox.addEventListener("click", (event) => event.stopPropagation());
   game.elements.introOverlay.addEventListener("click", (event) => event.stopPropagation());
   game.elements.matchingOverlay.addEventListener("click", (event) => event.stopPropagation());
+  game.elements.identityChoiceOverlay.addEventListener("click", (event) => event.stopPropagation());
+  game.elements.virtualTransitionOverlay.addEventListener("click", (event) => event.stopPropagation());
   game.elements.dialogueNextButton.addEventListener("click", () => {
     if (game.state.selfTalkActive) {
       game.systems.selfTalk.advance();
@@ -343,6 +379,16 @@
   game.elements.dialogueCloseButton.addEventListener("click", game.systems.dialogue.close);
   game.elements.submitMatchesButton.addEventListener("click", game.systems.matchingGame.submit);
   game.elements.introNextButton.addEventListener("click", advanceIntro);
+  game.elements.identityNextButton.addEventListener("click", game.systems.identityChoice.advance);
+  game.elements.identityAnswerButtons.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-score]");
+
+    if (!button) {
+      return;
+    }
+
+    game.systems.identityChoice.choose(button.dataset.score);
+  });
   window.addEventListener("keydown", handleKeydown);
 
   showScreen("title");

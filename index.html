@@ -98,6 +98,38 @@
                 </button>
               </div>
             </section>
+            <section id="identity-choice-overlay" class="identity-choice-overlay hidden" aria-live="polite">
+              <div class="identity-choice-panel">
+                <p id="identity-question-text" class="identity-question-text"></p>
+                <button id="identity-next-button" class="intro-next-button hidden" type="button">
+                  Next
+                </button>
+                <div id="identity-answer-buttons" class="identity-answer-buttons hidden">
+                  <button type="button" data-score="body">
+                    I am who I see in the mirror
+                  </button>
+                  <button type="button" data-score="fragmented">
+                    I am many things, not one
+                  </button>
+                  <button type="button" data-score="collective">
+                    I am a cog in the system
+                  </button>
+                </div>
+              </div>
+            </section>
+            <section
+              id="virtual-transition-overlay"
+              class="virtual-transition-overlay hidden"
+              aria-hidden="true"
+            >
+              <div class="virtual-tunnel">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <p class="virtual-transition-label">Virtual Body Link</p>
+            </section>
           </div>
 
           <aside class="side-panel">
@@ -122,6 +154,7 @@
     </main>
 
     <script src="data/realities.js"></script>
+    <script src="data/endingScores.js"></script>
     <script src="layers/body.js"></script>
     <script src="layers/artificialBody.js"></script>
     <script src="layers/dream.js"></script>
@@ -131,6 +164,7 @@
     <script src="systems/dialogue.js"></script>
     <script src="systems/selfTalk.js"></script>
     <script src="systems/matchingGame.js"></script>
+    <script src="systems/identityChoice.js"></script>
     <script src="systems/screenEffects.js"></script>
     <script src="script.js"></script>
   </body>

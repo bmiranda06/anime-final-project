@@ -45,6 +45,8 @@
     return (
       performance.now() < game.state.movementFreezeUntil ||
       game.state.introActive ||
+      game.state.identityChoiceActive ||
+      game.state.virtualTransitionActive ||
       !game.elements.dialogueBox.classList.contains("hidden") ||
       !game.elements.matchingOverlay.classList.contains("hidden")
     );

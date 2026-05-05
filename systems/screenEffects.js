@@ -15,6 +15,35 @@
     }, 1800);
   }
 
+  function transitionToArtificialBody(onWorldSwap) {
+    const game = window.SignalSelf;
+    const overlay = game.elements.virtualTransitionOverlay;
+
+    game.state.virtualTransitionActive = true;
+    game.systems.movement.freeze(3000);
+    game.elements.clickTarget.classList.remove("active");
+
+    if (!overlay) {
+      onWorldSwap?.();
+      game.state.virtualTransitionActive = false;
+      return;
+    }
+
+    overlay.classList.remove("hidden", "virtual-transition-active");
+    void overlay.offsetWidth;
+    overlay.classList.add("virtual-transition-active");
+
+    window.setTimeout(() => {
+      onWorldSwap?.();
+    }, 1150);
+
+    window.setTimeout(() => {
+      overlay.classList.remove("virtual-transition-active");
+      overlay.classList.add("hidden");
+      game.state.virtualTransitionActive = false;
+    }, 2700);
+  }
+
   function setCrackStage(stage) {
     const game = window.SignalSelf;
     game.elements.world.classList.remove("crack-stage-1", "crack-stage-2", "crack-stage-3");
@@ -28,6 +57,7 @@
 
   window.SignalSelf.systems.screenEffects = {
     triggerBodyBreakCutscene,
+    transitionToArtificialBody,
     setCrackStage,
   };
 })();

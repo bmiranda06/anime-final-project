@@ -131,8 +131,7 @@
       return;
     }
 
-    game.elements.matchingFeedback.textContent = "Wrong. The body cannot solve itself.";
-    window.setTimeout(game.enterArtificialBody, 1100);
+    game.systems.identityChoice.beginAfterBodyFailure();
   }
 
   function resetAssignments() {
