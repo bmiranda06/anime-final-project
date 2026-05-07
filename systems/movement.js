@@ -36,6 +36,7 @@
     game.layers.body.updateNearbyFigure();
     game.layers.artificialBody.updateNearbyFigure?.();
     game.layers.artificialBody.update?.();
+    game.layers.dream.updateNearbyFigure?.();
     renderPlayer();
 
     game.state.animationFrame = window.requestAnimationFrame(update);
@@ -49,6 +50,7 @@
       game.state.introActive ||
       game.state.identityChoiceActive ||
       game.state.virtualTransitionActive ||
+      game.layers.dream.isInteractionBlockingMovement?.() ||
       !game.elements.dialogueBox.classList.contains("hidden") ||
       !game.elements.matchingOverlay.classList.contains("hidden")
     );
