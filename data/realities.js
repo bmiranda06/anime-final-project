@@ -24,14 +24,14 @@
         label: "Dream",
         key: "3",
         worldClass: "reality-dream",
-        message: "Dream reality is still locked.",
+        message: "Dream reality active. Prototype shell online for testing.",
       },
       {
         id: "network",
         label: "Network",
         key: "4",
         worldClass: "reality-network",
-        message: "Network reality is still locked.",
+        message: "Network reality active. Prototype shell online for testing.",
       },
     ],
     bootMessages: [

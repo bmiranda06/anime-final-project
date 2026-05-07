@@ -34,6 +34,8 @@
     }
 
     game.layers.body.updateNearbyFigure();
+    game.layers.artificialBody.updateNearbyFigure?.();
+    game.layers.artificialBody.update?.();
     renderPlayer();
 
     game.state.animationFrame = window.requestAnimationFrame(update);
@@ -84,22 +86,37 @@
     if (!moved) {
       game.elements.clickTarget.classList.remove("active");
       game.elements.systemMessage.textContent =
+        game.layers.artificialBody.getCollisionMessage?.() ||
+        game.layers.body.getCollisionMessage?.() ||
         "Your body refuses the path. The obstruction is not symbolic in this layer.";
     }
   }
 
   function attemptPlayerMove(deltaX, deltaY) {
     const game = window.SignalSelf;
-    const nextX = clamp(game.state.player.x + deltaX, 3, 97);
-    const nextY = clamp(game.state.player.y + deltaY, 5, 95);
+    const clampedPosition = game.layers.artificialBody.getClampedPlayerPosition?.(
+      clamp(game.state.player.x + deltaX, 3, 97),
+      clamp(game.state.player.y + deltaY, 5, 95)
+    ) || {
+      x: clamp(game.state.player.x + deltaX, 3, 97),
+      y: clamp(game.state.player.y + deltaY, 5, 95),
+    };
+    const nextX = clampedPosition.x;
+    const nextY = clampedPosition.y;
     let moved = false;
 
-    if (!game.layers.body.wouldCollide(nextX, game.state.player.y)) {
+    if (
+      !game.layers.body.wouldCollide(nextX, game.state.player.y) &&
+      !game.layers.artificialBody.wouldCollide?.(nextX, game.state.player.y)
+    ) {
       game.state.player.x = nextX;
       moved = moved || Math.abs(deltaX) > 0;
     }
 
-    if (!game.layers.body.wouldCollide(game.state.player.x, nextY)) {
+    if (
+      !game.layers.body.wouldCollide(game.state.player.x, nextY) &&
+      !game.layers.artificialBody.wouldCollide?.(game.state.player.x, nextY)
+    ) {
       game.state.player.y = nextY;
       moved = moved || Math.abs(deltaY) > 0;
     }
@@ -121,11 +138,15 @@
     }
 
     const rect = game.elements.world.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width) * 100;
-    const y = ((event.clientY - rect.top) / rect.height) * 100;
+    const rawX = ((event.clientX - rect.left) / rect.width) * 100;
+    const rawY = ((event.clientY - rect.top) / rect.height) * 100;
+    const adjustedTarget = game.layers.artificialBody.adjustClickTarget?.(rawX, rawY) || {
+      x: rawX,
+      y: rawY,
+    };
 
-    game.state.player.targetX = clamp(x, 3, 97);
-    game.state.player.targetY = clamp(y, 5, 95);
+    game.state.player.targetX = clamp(adjustedTarget.x, 3, 97);
+    game.state.player.targetY = clamp(adjustedTarget.y, 5, 95);
 
     game.elements.clickTarget.style.left = `${game.state.player.targetX}%`;
     game.elements.clickTarget.style.top = `${game.state.player.targetY}%`;

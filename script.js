@@ -6,7 +6,7 @@
   game.state = {
     currentScreen: "title",
     activeReality: "body",
-    unlockedRealities: new Set(["body"]),
+    unlockedRealities: new Set(["body", "artificial", "dream", "network"]),
     player: {
       x: 50,
       y: 55,
@@ -35,6 +35,17 @@
     identityChoiceActive: false,
     identityChoiceStep: 0,
     virtualTransitionActive: false,
+    shinjiDialoguePhase: null,
+    shinjiResponseLines: [],
+    shinjiQuestionsAsked: {
+      whoAreYou: false,
+      whoAmI: false,
+    },
+    shinjiHelpAccepted: false,
+    customDialogueActive: false,
+    customDialogueSpeaker: "",
+    customDialogueLines: [],
+    customDialogueOnComplete: null,
   };
 
   game.elements = {
@@ -113,7 +124,7 @@
 
   function resetPrototype() {
     game.state.activeReality = "body";
-    game.state.unlockedRealities = new Set(["body"]);
+    game.state.unlockedRealities = new Set(["body", "artificial", "dream", "network"]);
     game.state.player.x = 50;
     game.state.player.y = 55;
     game.state.player.targetX = 50;
@@ -136,6 +147,17 @@
     game.state.identityChoiceActive = false;
     game.state.identityChoiceStep = 0;
     game.state.virtualTransitionActive = false;
+    game.state.shinjiDialoguePhase = null;
+    game.state.shinjiResponseLines = [];
+    game.state.shinjiQuestionsAsked = {
+      whoAreYou: false,
+      whoAmI: false,
+    };
+    game.state.shinjiHelpAccepted = false;
+    game.state.customDialogueActive = false;
+    game.state.customDialogueSpeaker = "";
+    game.state.customDialogueLines = [];
+    game.state.customDialogueOnComplete = null;
     game.endingScoreSystem.resetEndingScores();
     game.elements.clickTarget.classList.remove("active");
     game.elements.dialogueBox.classList.add("hidden");
@@ -149,6 +171,8 @@
     game.elements.virtualTransitionOverlay.classList.remove("virtual-transition-active");
     game.elements.interactionPrompt.classList.remove("visible");
     game.systems.screenEffects.setCrackStage(0);
+    game.systems.dialogue?.hideShinjiPortrait?.();
+    game.layers.artificialBody.reset?.();
     game.systems.movement.stopGameLoop();
   }
 
@@ -167,7 +191,7 @@
       button.dataset.reality = reality.id;
       button.style.color = getRealityColor(reality.id);
       button.setAttribute("aria-label", unlocked ? reality.label : `${reality.label} locked`);
-      button.addEventListener("click", () => setReality(reality.id));
+      button.addEventListener("click", () => setReality(reality.id, { restart: true }));
       game.elements.realityButtons.appendChild(button);
     });
 
@@ -191,6 +215,10 @@
       return;
     }
 
+    if (options.restart !== false) {
+      restartLayer(reality.id);
+    }
+
     game.state.activeReality = reality.id;
     game.state.nearbyFigureId = null;
     game.elements.world.className = `world ${reality.worldClass}`;
@@ -199,6 +227,57 @@
     game.elements.dialogueBox.classList.add("hidden");
     updateRealityButtonState();
     game.layers.body.updateNearbyFigure();
+
+    if (reality.id === "artificial") {
+      game.layers.artificialBody.onEnter();
+    }
+  }
+
+  function restartLayer(realityId) {
+    game.elements.clickTarget.classList.remove("active");
+    game.elements.dialogueBox.classList.add("hidden");
+    game.elements.matchingOverlay.classList.add("hidden");
+    game.elements.introOverlay.classList.add("hidden");
+    game.elements.introNextButton.classList.add("hidden");
+    game.elements.identityChoiceOverlay.classList.add("hidden");
+    game.elements.identityAnswerButtons.classList.add("hidden");
+    game.elements.identityNextButton.classList.add("hidden");
+    game.elements.interactionPrompt.classList.remove("visible");
+    game.systems.typewriter.stop();
+    game.systems.dialogue?.hideShinjiPortrait?.();
+    game.systems.screenEffects.setCrackStage(0);
+    game.layers.artificialBody.reset?.();
+    game.state.nearbyFigureId = null;
+    game.state.activeDialogueFigureId = null;
+    game.state.dialogueLineIndex = 0;
+    game.state.customDialogueActive = false;
+    game.state.customDialogueSpeaker = "";
+    game.state.customDialogueLines = [];
+    game.state.customDialogueOnComplete = null;
+    game.state.selfTalkActive = false;
+    game.state.selfTalkReady = false;
+    game.state.identityChoiceActive = false;
+    game.state.identityChoiceStep = 0;
+    game.state.movementFreezeUntil = 0;
+    game.state.player.x = 50;
+    game.state.player.y = 55;
+    game.state.player.targetX = 50;
+    game.state.player.targetY = 55;
+
+    if (realityId === "body") {
+      game.state.spokenFigureIds = new Set();
+      game.state.bodyChallengeStarted = false;
+      game.state.matchingAssignments = new Map();
+      game.state.matchAttempt = 0;
+      game.state.shinjiDialoguePhase = null;
+      game.state.shinjiResponseLines = [];
+      game.state.shinjiQuestionsAsked = {
+        whoAreYou: false,
+        whoAmI: false,
+      };
+      game.state.shinjiHelpAccepted = false;
+      game.layers.body.render();
+    }
   }
 
   function updateRealityButtonState() {
@@ -233,12 +312,7 @@
     game.elements.matchingOverlay.classList.add("hidden");
     game.systems.screenEffects.setCrackStage(0);
     unlockReality("artificial");
-    game.state.player.x = 50;
-    game.state.player.y = 55;
-    game.state.player.targetX = 50;
-    game.state.player.targetY = 55;
     setReality("artificial", { force: true });
-    game.layers.artificialBody.onEnter();
     game.systems.movement.renderPlayer();
   }
 
@@ -341,6 +415,11 @@
       return;
     }
 
+    if (key === "e" && game.state.activeReality === "artificial") {
+      game.layers.artificialBody.interact?.();
+      return;
+    }
+
     if (key === "e" && game.state.nearbyFigureId) {
       game.systems.dialogue.open(game.state.nearbyFigureId);
       return;
@@ -390,6 +469,7 @@
     game.systems.identityChoice.choose(button.dataset.score);
   });
   window.addEventListener("keydown", handleKeydown);
+  window.addEventListener("resize", () => game.layers.body.refreshLayout?.());
 
   showScreen("title");
 })();
