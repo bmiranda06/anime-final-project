@@ -173,6 +173,7 @@
     game.systems.screenEffects.setCrackStage(0);
     game.systems.dialogue?.hideShinjiPortrait?.();
     game.layers.artificialBody.reset?.();
+    game.layers.dream.reset?.();
     game.systems.movement.stopGameLoop();
   }
 
@@ -231,6 +232,10 @@
     if (reality.id === "artificial") {
       game.layers.artificialBody.onEnter();
     }
+
+    if (reality.id === "dream") {
+      game.layers.dream.onEnter();
+    }
   }
 
   function restartLayer(realityId) {
@@ -247,6 +252,7 @@
     game.systems.dialogue?.hideShinjiPortrait?.();
     game.systems.screenEffects.setCrackStage(0);
     game.layers.artificialBody.reset?.();
+    game.layers.dream.reset?.();
     game.state.nearbyFigureId = null;
     game.state.activeDialogueFigureId = null;
     game.state.dialogueLineIndex = 0;
@@ -417,6 +423,11 @@
 
     if (key === "e" && game.state.activeReality === "artificial") {
       game.layers.artificialBody.interact?.();
+      return;
+    }
+
+    if (key === "e" && game.state.activeReality === "dream") {
+      game.layers.dream.interact?.();
       return;
     }
 
