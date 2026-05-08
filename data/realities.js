@@ -31,7 +31,8 @@
         label: "Network",
         key: "4",
         worldClass: "reality-network",
-        message: "Network reality active. Prototype shell online for testing.",
+        message:
+          "Network reality active. The self disperses across every channel that ever heard your name.",
       },
     ],
     bootMessages: [

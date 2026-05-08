@@ -51,6 +51,7 @@
       game.state.identityChoiceActive ||
       game.state.virtualTransitionActive ||
       game.layers.dream.isInteractionBlockingMovement?.() ||
+      game.layers.network.isInteractionBlockingMovement?.() ||
       !game.elements.dialogueBox.classList.contains("hidden") ||
       !game.elements.matchingOverlay.classList.contains("hidden")
     );

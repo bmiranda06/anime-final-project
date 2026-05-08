@@ -174,6 +174,7 @@
     game.systems.dialogue?.hideShinjiPortrait?.();
     game.layers.artificialBody.reset?.();
     game.layers.dream.reset?.();
+    game.layers.network.reset?.();
     game.systems.movement.stopGameLoop();
   }
 
@@ -236,6 +237,10 @@
     if (reality.id === "dream") {
       game.layers.dream.onEnter();
     }
+
+    if (reality.id === "network") {
+      game.layers.network.onEnter?.();
+    }
   }
 
   function restartLayer(realityId) {
@@ -253,6 +258,7 @@
     game.systems.screenEffects.setCrackStage(0);
     game.layers.artificialBody.reset?.();
     game.layers.dream.reset?.();
+    game.layers.network.reset?.();
     game.state.nearbyFigureId = null;
     game.state.activeDialogueFigureId = null;
     game.state.dialogueLineIndex = 0;

@@ -479,6 +479,14 @@
     getStage().innerHTML = "";
     game.elements.systemMessage.textContent =
       "The dream keeps one answer and lets the others dissolve.";
+
+    window.setTimeout(() => {
+      if (game.state.activeReality !== "dream") {
+        return;
+      }
+
+      game.setReality("network", { restart: true });
+    }, 2400);
   }
 
   function getQuestionnaireScore() {
