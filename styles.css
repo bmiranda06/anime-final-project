@@ -3267,6 +3267,505 @@ h2 {
   cursor: not-allowed;
 }
 
+.network-cutscene-panel {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  display: grid;
+  grid-template-columns: minmax(280px, 0.95fr) minmax(320px, 1.05fr);
+  align-items: center;
+  gap: clamp(20px, 4vw, 54px);
+  padding: clamp(18px, 4vw, 54px);
+  overflow: auto;
+  background:
+    linear-gradient(135deg, rgba(3, 7, 12, 0.98), rgba(4, 13, 20, 0.94)),
+    repeating-linear-gradient(90deg, transparent 0 30px, rgba(247, 251, 255, 0.035) 30px 32px);
+}
+
+.network-cutscene-panel::before,
+.network-cutscene-panel::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+}
+
+.network-cutscene-panel::before {
+  opacity: 0.8;
+  background-image:
+    linear-gradient(rgba(247, 251, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(247, 251, 255, 0.04) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: radial-gradient(circle at 70% 50%, black, transparent 70%);
+}
+
+.network-cutscene-panel::after {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 100% 4px;
+  mix-blend-mode: screen;
+  opacity: 0.22;
+}
+
+.network-cutscene-panel.cutscene-body {
+  background:
+    radial-gradient(circle at 72% 52%, rgba(255, 66, 104, 0.22), transparent 34%),
+    radial-gradient(circle at 18% 18%, rgba(255, 209, 102, 0.12), transparent 28%),
+    linear-gradient(135deg, rgba(17, 5, 9, 0.98), rgba(5, 8, 14, 0.96));
+}
+
+.network-cutscene-panel.cutscene-fragmented {
+  background:
+    radial-gradient(circle at 74% 48%, rgba(168, 85, 255, 0.28), transparent 36%),
+    radial-gradient(circle at 24% 82%, rgba(93, 255, 156, 0.1), transparent 28%),
+    linear-gradient(135deg, rgba(8, 5, 22, 0.98), rgba(7, 10, 18, 0.96));
+}
+
+.network-cutscene-panel.cutscene-collective {
+  background:
+    radial-gradient(circle at 74% 48%, rgba(34, 247, 255, 0.22), transparent 36%),
+    radial-gradient(circle at 18% 20%, rgba(255, 209, 102, 0.12), transparent 26%),
+    linear-gradient(135deg, rgba(3, 14, 21, 0.98), rgba(7, 10, 16, 0.96));
+}
+
+.network-cutscene-copy,
+.network-cutscene-visual {
+  position: relative;
+  z-index: 1;
+}
+
+.network-cutscene-copy {
+  display: grid;
+  align-content: center;
+  gap: 14px;
+  max-width: 660px;
+}
+
+.network-cutscene-copy h2 {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 5rem);
+  line-height: 0.95;
+  text-shadow:
+    3px 0 rgba(34, 247, 255, 0.42),
+    -3px 0 rgba(255, 66, 104, 0.38);
+}
+
+.network-cutscene-subtitle {
+  margin: 0;
+  color: rgba(247, 251, 255, 0.78);
+  font-size: clamp(1rem, 2vw, 1.35rem);
+  font-style: italic;
+  line-height: 1.35;
+}
+
+.network-cutscene-lines {
+  display: grid;
+  gap: 10px;
+  min-height: 270px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.network-cutscene-lines li {
+  min-height: 42px;
+  padding: 9px 0 9px 16px;
+  border-left: 2px solid rgba(247, 251, 255, 0.22);
+  color: rgba(247, 251, 255, 0.86);
+  font-size: clamp(0.94rem, 1.45vw, 1.05rem);
+  line-height: 1.45;
+  opacity: 0.25;
+  transform: translateX(-8px);
+  transition: opacity 220ms ease, transform 220ms ease, border-color 220ms ease;
+}
+
+.network-cutscene-lines li.active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.network-cutscene-lines li.complete {
+  border-color: rgba(34, 247, 255, 0.48);
+}
+
+.network-cutscene-button {
+  justify-self: start;
+}
+
+.network-cutscene-button.hidden {
+  display: none;
+}
+
+.network-cutscene-visual {
+  min-height: clamp(280px, 52vh, 540px);
+  overflow: hidden;
+  border: 1px solid rgba(247, 251, 255, 0.16);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(247, 251, 255, 0.08), transparent 34%),
+    linear-gradient(180deg, rgba(4, 10, 18, 0.24), rgba(0, 0, 0, 0.2));
+  box-shadow:
+    inset 0 0 48px rgba(247, 251, 255, 0.05),
+    0 0 52px rgba(0, 0, 0, 0.32);
+  isolation: isolate;
+}
+
+.network-cutscene-visual::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(34, 247, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 66, 104, 0.06) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(circle at center, black, transparent 74%);
+  content: "";
+}
+
+.physical-union {
+  background:
+    radial-gradient(circle at 50% 52%, rgba(255, 66, 104, 0.28), transparent 28%),
+    linear-gradient(180deg, rgba(13, 4, 8, 0.82), rgba(5, 8, 14, 0.5));
+}
+
+.physical-pulse,
+.physical-figure,
+.physical-combined {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+
+.physical-pulse {
+  width: clamp(150px, 34vw, 360px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 66, 104, 0.5);
+  border-radius: 50%;
+  box-shadow:
+    0 0 38px rgba(255, 66, 104, 0.32),
+    inset 0 0 32px rgba(255, 209, 102, 0.12);
+  transform: translate(-50%, -50%);
+  animation: physicalPulse 2.8s ease-in-out infinite;
+}
+
+.physical-figure,
+.physical-combined,
+.collective-figure,
+.fractured-mirror-self {
+  width: clamp(58px, 10vw, 92px);
+  height: clamp(144px, 24vw, 220px);
+}
+
+.physical-figure::before,
+.physical-combined::before,
+.collective-figure::before,
+.fractured-mirror-self::before {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 42%;
+  aspect-ratio: 1;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  background: rgba(3, 7, 12, 0.78);
+  box-shadow: 0 0 22px currentColor;
+  transform: translateX(-50%);
+  content: "";
+}
+
+.physical-figure span,
+.physical-combined span,
+.collective-figure span,
+.fractured-mirror-self span {
+  position: absolute;
+  left: 50%;
+  top: 28%;
+  width: 38%;
+  height: 58%;
+  border: 2px solid currentColor;
+  border-radius: 999px 999px 18px 18px;
+  background: linear-gradient(180deg, rgba(247, 251, 255, 0.18), rgba(247, 251, 255, 0.03));
+  box-shadow: 0 0 24px currentColor;
+  transform: translateX(-50%);
+}
+
+.physical-figure span::before,
+.physical-combined span::before,
+.collective-figure span::before,
+.fractured-mirror-self span::before {
+  position: absolute;
+  left: 50%;
+  top: 18%;
+  width: 220%;
+  height: 2px;
+  background: currentColor;
+  box-shadow: 0 0 14px currentColor;
+  transform: translateX(-50%);
+  content: "";
+}
+
+.physical-player {
+  color: var(--cyan);
+  transform: translate(-245%, -50%);
+  animation: physicalPlayerMerge 7s ease-in-out infinite;
+}
+
+.physical-shinji {
+  color: var(--red);
+  transform: translate(145%, -50%);
+  animation: physicalShinjiMerge 7s ease-in-out infinite;
+}
+
+.physical-combined {
+  color: var(--amber);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.92);
+  animation: physicalCoreReveal 7s ease-in-out infinite;
+}
+
+.fractured-echoes {
+  background:
+    radial-gradient(circle at 50% 48%, rgba(168, 85, 255, 0.2), transparent 32%),
+    linear-gradient(160deg, rgba(9, 5, 22, 0.82), rgba(3, 7, 12, 0.38));
+}
+
+.fractured-echo-field,
+.collective-memory-field {
+  position: absolute;
+  inset: 0;
+}
+
+.fractured-echo-field span {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--echo-size);
+  height: calc(var(--echo-size) * 2.35);
+  color: rgba(168, 85, 255, 0.72);
+  border: 1px solid currentColor;
+  border-radius: 999px 999px 3px 3px;
+  opacity: 0.28;
+  transform: translate(-50%, -50%);
+  animation: fracturedEchoPulse 2.4s ease-in-out infinite;
+  animation-delay: var(--echo-delay);
+}
+
+.fractured-echo-field span::before {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--echo-size) * -0.72);
+  width: calc(var(--echo-size) * 1.15);
+  aspect-ratio: 1;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: rgba(3, 7, 12, 0.78);
+  transform: translateX(-50%);
+  content: "";
+}
+
+.fractured-mirror {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(170px, 34vw, 270px);
+  height: clamp(260px, 46vw, 410px);
+  border: 2px solid rgba(247, 251, 255, 0.54);
+  border-radius: 44% 44% 8px 8px;
+  background:
+    linear-gradient(135deg, rgba(247, 251, 255, 0.16), transparent 28%),
+    radial-gradient(circle at 52% 28%, rgba(34, 247, 255, 0.22), transparent 24%),
+    rgba(7, 10, 18, 0.82);
+  box-shadow:
+    0 0 40px rgba(168, 85, 255, 0.34),
+    inset 0 0 34px rgba(247, 251, 255, 0.08);
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+}
+
+.fractured-mirror-shard {
+  position: absolute;
+  inset: 0;
+  border-left: 1px solid rgba(247, 251, 255, 0.35);
+  transform-origin: center;
+}
+
+.fractured-mirror-shard.shard-a {
+  transform: rotate(28deg) translateX(8%);
+}
+
+.fractured-mirror-shard.shard-b {
+  transform: rotate(-34deg) translateX(-11%);
+}
+
+.fractured-mirror-self {
+  position: absolute;
+  left: 50%;
+  top: 54%;
+  color: var(--violet);
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 0 20px rgba(168, 85, 255, 0.8));
+}
+
+.collective-link {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(34, 247, 255, 0.2), transparent 30%),
+    linear-gradient(160deg, rgba(4, 18, 26, 0.84), rgba(3, 7, 12, 0.36));
+}
+
+.collective-memory-field span {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 14px;
+  height: 14px;
+  border: 1px solid rgba(255, 209, 102, 0.9);
+  border-radius: 50%;
+  background: rgba(255, 209, 102, 0.16);
+  box-shadow: 0 0 20px rgba(255, 209, 102, 0.4);
+  transform: translate(-50%, -50%);
+  animation: collectiveMemoryPulse 2.8s ease-in-out infinite;
+  animation-delay: var(--memory-delay);
+}
+
+.collective-bridge {
+  position: absolute;
+  inset: 28% 16% 26%;
+}
+
+.collective-bridge span {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 50%;
+  height: 28%;
+  border-top: 2px solid rgba(34, 247, 255, 0.78);
+  border-radius: 50%;
+  box-shadow: 0 -8px 26px rgba(34, 247, 255, 0.26);
+  animation: collectiveBridgeFlow 3.2s ease-in-out infinite;
+}
+
+.collective-bridge span:nth-child(2) {
+  top: 42%;
+  border-color: rgba(255, 209, 102, 0.72);
+  animation-delay: -0.8s;
+}
+
+.collective-bridge span:nth-child(3) {
+  top: 58%;
+  border-color: rgba(93, 255, 156, 0.7);
+  animation-delay: -1.6s;
+}
+
+.collective-figure {
+  position: absolute;
+  top: 50%;
+}
+
+.collective-player {
+  left: 28%;
+  color: var(--cyan);
+  transform: translate(-50%, -50%);
+}
+
+.collective-shinji {
+  left: 72%;
+  color: var(--amber);
+  transform: translate(-50%, -50%);
+}
+
+@keyframes physicalPulse {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: translate(-50%, -50%) scale(0.86);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+}
+
+@keyframes physicalPlayerMerge {
+  0%,
+  28% {
+    opacity: 1;
+    transform: translate(-245%, -50%);
+  }
+
+  62%,
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@keyframes physicalShinjiMerge {
+  0%,
+  28% {
+    opacity: 1;
+    transform: translate(145%, -50%);
+  }
+
+  62%,
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@keyframes physicalCoreReveal {
+  0%,
+  45% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.86);
+  }
+
+  70%,
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+}
+
+@keyframes fracturedEchoPulse {
+  0%,
+  100% {
+    opacity: 0.18;
+    filter: blur(0);
+  }
+
+  50% {
+    opacity: 0.56;
+    filter: blur(0.5px);
+  }
+}
+
+@keyframes collectiveMemoryPulse {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: translate(-50%, -50%) scale(0.82);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.22);
+  }
+}
+
+@keyframes collectiveBridgeFlow {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: translateY(6px);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateY(-6px);
+  }
+}
+
 .network-ending-panel {
   align-content: center;
   width: min(820px, calc(100% - 36px));
@@ -3446,6 +3945,16 @@ h2 {
   .network-orbit-row {
     grid-template-columns: 1fr;
   }
+
+  .network-cutscene-panel {
+    grid-template-columns: 1fr;
+    align-content: start;
+  }
+
+  .network-cutscene-visual {
+    order: -1;
+    min-height: 320px;
+  }
 }
 
 @media (max-width: 620px) {
@@ -3469,5 +3978,18 @@ h2 {
 
   .world {
     min-height: 58vh;
+  }
+
+  .network-cutscene-panel {
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .network-cutscene-visual {
+    min-height: 260px;
+  }
+
+  .network-cutscene-lines {
+    min-height: 310px;
   }
 }

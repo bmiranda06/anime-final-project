@@ -128,6 +128,42 @@
     },
   };
 
+  const cutscenes = {
+    body: {
+      title: "Physical Ending",
+      subtitle: "Two bodies answer as one.",
+      lines: [
+        "Shinji reaches for you at the edge of the signal.",
+        "Your pulse answers his before either of you can speak.",
+        "The screen cannot decide which outline belongs to the player and which belongs to Shinji.",
+        "Skin, memory, fear, and choice fold into a single body.",
+        "When the light settles, there is no pilot and no companion. There is only one self breathing.",
+      ],
+    },
+    fragmented: {
+      title: "Fractured Ending",
+      subtitle: "The mirror keeps opening.",
+      lines: [
+        "You step toward the reflection expecting to find the player.",
+        "The face looking back is Shinji's.",
+        "Then the mirror splits, and every shard returns the same eyes.",
+        "Thousands upon thousands of Shinjis wait inside the dark, each one carrying a different thought.",
+        "You are not the original. You are one Shinji inside a self too large to see at once.",
+      ],
+    },
+    collective: {
+      title: "Collective Ending",
+      subtitle: "The search continues in two voices.",
+      lines: [
+        "Shinji stands beside you instead of across from you.",
+        "You share the thoughts you were hiding and the memories he was afraid to name.",
+        "Neither mind disappears. Each one gives the other a new path through the noise.",
+        "Together, you keep walking through body, dream, machine, and network.",
+        "The quest is no longer to find one final self, but to keep finding yourselves.",
+      ],
+    },
+  };
+
   const network = {
     phase: "idle",
     content: null,
@@ -135,6 +171,7 @@
     dragId: null,
     centerMessageTimer: null,
     centerMessageExitTimer: null,
+    cutsceneLineTimer: null,
   };
 
   function onEnter() {
@@ -168,6 +205,11 @@
     if (network.centerMessageExitTimer) {
       window.clearTimeout(network.centerMessageExitTimer);
       network.centerMessageExitTimer = null;
+    }
+
+    if (network.cutsceneLineTimer) {
+      window.clearTimeout(network.cutsceneLineTimer);
+      network.cutsceneLineTimer = null;
     }
   }
 
@@ -531,16 +573,194 @@
         element.disabled = true;
       });
 
-    renderEndingPhase();
+    const [scoreName] = game.endingScoreSystem.getHighestEndingScore();
+    renderCutscenePhase(scoreName);
   }
 
-  function renderEndingPhase() {
+  function renderCutscenePhase(scoreName) {
+    const game = window.SignalSelf;
+    const content = ensureContent();
+    const resolvedScoreName = cutscenes[scoreName] ? scoreName : "body";
+    const cutscene = cutscenes[resolvedScoreName];
+    network.phase = "cutscene";
+    content.innerHTML = "";
+
+    game.elements.systemMessage.textContent =
+      `Ending cutscene playing: ${cutscene.title}.`;
+
+    const panel = document.createElement("section");
+    panel.className = `network-cutscene-panel cutscene-${resolvedScoreName}`;
+    panel.setAttribute("aria-label", `${cutscene.title} cutscene`);
+    panel.innerHTML = `
+      <div class="network-cutscene-copy">
+        <p class="kicker">Cutscene</p>
+        <h2>${cutscene.title}</h2>
+        <p class="network-cutscene-subtitle">${cutscene.subtitle}</p>
+        <ol class="network-cutscene-lines" data-cutscene-lines>
+          ${cutscene.lines.map(() => `<li></li>`).join("")}
+        </ol>
+        <button type="button" class="network-ending-button network-cutscene-button hidden" data-action="finish-cutscene" disabled>
+          Continue
+        </button>
+      </div>
+      ${renderCutsceneVisual(resolvedScoreName)}
+    `;
+    content.appendChild(panel);
+
+    panel.addEventListener("click", (event) => {
+      const button = event.target.closest(
+        "button[data-action='finish-cutscene']"
+      );
+
+      if (!button || button.disabled) {
+        return;
+      }
+
+      renderEndingPhase(resolvedScoreName);
+    });
+
+    startCutsceneLines(cutscene);
+  }
+
+  function startCutsceneLines(cutscene) {
+    const game = window.SignalSelf;
+    const lineElements = Array.from(
+      network.content?.querySelectorAll("[data-cutscene-lines] li") || []
+    );
+    const button = network.content?.querySelector(
+      "button[data-action='finish-cutscene']"
+    );
+    let lineIndex = 0;
+
+    function writeNextLine() {
+      network.cutsceneLineTimer = null;
+
+      if (network.phase !== "cutscene") {
+        return;
+      }
+
+      if (lineIndex >= cutscene.lines.length) {
+        if (button) {
+          button.disabled = false;
+          button.classList.remove("hidden");
+          button.focus();
+        }
+        return;
+      }
+
+      const lineElement = lineElements[lineIndex];
+      lineElement.classList.add("active");
+
+      game.systems.typewriter.write({
+        text: cutscene.lines[lineIndex],
+        target: lineElement,
+        speed: 24,
+        onComplete() {
+          lineElement.classList.add("complete");
+          lineIndex += 1;
+          network.cutsceneLineTimer = window.setTimeout(writeNextLine, 520);
+        },
+      });
+    }
+
+    writeNextLine();
+  }
+
+  function renderCutsceneVisual(scoreName) {
+    if (scoreName === "fragmented") {
+      return `
+        <div class="network-cutscene-visual fractured-echoes" aria-hidden="true">
+          <div class="fractured-echo-field">
+            ${renderFracturedEchoes()}
+          </div>
+          <div class="fractured-mirror">
+            <div class="fractured-mirror-shard shard-a"></div>
+            <div class="fractured-mirror-shard shard-b"></div>
+            <div class="fractured-mirror-self">
+              <span></span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (scoreName === "collective") {
+      return `
+        <div class="network-cutscene-visual collective-link" aria-hidden="true">
+          <div class="collective-memory-field">
+            ${renderCollectiveMemories()}
+          </div>
+          <div class="collective-bridge">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="collective-figure collective-player">
+            <span></span>
+          </div>
+          <div class="collective-figure collective-shinji">
+            <span></span>
+          </div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="network-cutscene-visual physical-union" aria-hidden="true">
+        <div class="physical-pulse"></div>
+        <div class="physical-figure physical-player">
+          <span></span>
+        </div>
+        <div class="physical-figure physical-shinji">
+          <span></span>
+        </div>
+        <div class="physical-combined">
+          <span></span>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderFracturedEchoes() {
+    return Array.from({ length: 120 }, (_, index) => {
+      const x = (index * 37) % 100;
+      const y = (index * 61) % 100;
+      const delay = (index % 15) * -0.16;
+      const size = 7 + (index % 5);
+      return `<span style="--x: ${x}%; --y: ${y}%; --echo-delay: ${delay}s; --echo-size: ${size}px"></span>`;
+    }).join("");
+  }
+
+  function renderCollectiveMemories() {
+    const positions = [
+      [50, 13],
+      [71, 22],
+      [84, 43],
+      [76, 68],
+      [58, 82],
+      [35, 78],
+      [18, 61],
+      [14, 36],
+      [28, 18],
+      [50, 50],
+    ];
+
+    return positions
+      .map(([x, y], index) => {
+        const delay = index * -0.2;
+        return `<span style="--x: ${x}%; --y: ${y}%; --memory-delay: ${delay}s"></span>`;
+      })
+      .join("");
+  }
+
+  function renderEndingPhase(resolvedScoreName) {
     const game = window.SignalSelf;
     const content = ensureContent();
     network.phase = "ending";
     content.innerHTML = "";
 
-    const [scoreName] = game.endingScoreSystem.getHighestEndingScore();
+    const [highestScoreName] = game.endingScoreSystem.getHighestEndingScore();
+    const scoreName = resolvedScoreName || highestScoreName;
     const ending = endings[scoreName] || endings.body;
     const scores = game.endingScores;
 
